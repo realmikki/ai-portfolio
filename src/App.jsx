@@ -618,7 +618,7 @@ export default function App() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:3001/upload", {
+      const res = await fetch(`${API_URL}/upload`, {
         method: "POST",
         headers: { "x-admin-password": ADMIN_PASSWORD },
         body: formData
@@ -649,7 +649,7 @@ export default function App() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3001/ask", {
+      const res = await fetch(`${API_URL}/ask`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question, history: messages })
