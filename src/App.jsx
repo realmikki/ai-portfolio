@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
 const ADMIN_PASSWORD = "123"; // Change this to match server.js
 
 const styles = `
