@@ -705,18 +705,18 @@ export default function App() {
           <div className="divider" />
 
           <div className="profile-links">
-            <button className="profile-link">
+            <a className="profile-link" href="https://github.com/realmikki" target="_blank" rel="noreferrer">
               <div className="link-icon">🐙</div>
               GitHub
-            </button>
-            <button className="profile-link">
+            </a>
+            <a className="profile-link" href="https://www.linkedin.com/in/mikael-gaup-775699353/" target="_blank" rel="noreferrer">
               <div className="link-icon">💼</div>
               LinkedIn
-            </button>
-            <button className="profile-link">
+            </a>
+            <a className="profile-link" href="/cv.pdf" download>
               <div className="link-icon">📄</div>
               Download CV
-            </button>
+            </a>
           </div>
         </div>
 
