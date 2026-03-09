@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
-const ADMIN_PASSWORD = "123"; // Change this to match server.js
+const ADMIN_PASSWORD = "$/(7`90K[y@R"; // Change this to match server.js
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
