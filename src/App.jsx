@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
-const ADMIN_PASSWORD = "$/(7`90K[y@R"; // Change this to match server.js
+const ADMIN_PASSWORD = "$/(7`90K[y@R";
 
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
@@ -23,6 +23,7 @@ const styles = `
     display: flex;
     height: 100vh;
     width: 100%;
+    position: relative;
   }
 
   /* ---- LEFT PANEL ---- */
@@ -36,6 +37,7 @@ const styles = `
     padding: 40px 28px;
     position: relative;
     overflow: hidden;
+    z-index: 300;
   }
 
   .profile-panel::before {
@@ -199,7 +201,6 @@ const styles = `
     gap: 8px;
   }
 
-  /* Doc loaded badge in header */
   .doc-badge {
     display: flex; align-items: center; gap: 6px;
     background: #0f1a0f; border: 1px solid #1a3a1a;
@@ -402,6 +403,75 @@ const styles = `
 
   .input-hint { text-align: center; font-size: 11px; color: #252535; margin-top: 10px; }
 
+  /* ---- MOBILE ---- */
+  .mobile-menu-btn {
+    display: none;
+    background: transparent;
+    border: none;
+    color: #8888a8;
+    cursor: pointer;
+    padding: 4px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .mobile-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #00000077;
+    z-index: 299;
+  }
+
+  @media (max-width: 768px) {
+    .profile-panel {
+      position: fixed;
+      left: -320px;
+      top: 0;
+      height: 100vh;
+      z-index: 300;
+      transition: left 0.25s ease;
+      overflow-y: auto;
+    }
+
+    .profile-panel.open {
+      left: 0;
+    }
+
+    .mobile-menu-btn {
+      display: flex;
+    }
+
+    .mobile-overlay.open {
+      display: block;
+    }
+
+    .chat-header {
+      padding: 0 16px;
+    }
+
+    .message-row {
+      padding: 8px 16px;
+    }
+
+    .input-area {
+      padding: 12px 16px 20px;
+    }
+
+    .welcome {
+      padding: 24px 20px;
+    }
+
+    .welcome-greeting {
+      font-size: 22px;
+    }
+
+    .suggestions-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
   /* ---- ADMIN PANEL ---- */
   .admin-trigger {
     position: fixed;
@@ -422,7 +492,7 @@ const styles = `
     inset: 0;
     background: #00000088;
     backdrop-filter: blur(4px);
-    z-index: 200;
+    z-index: 400;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -524,9 +594,7 @@ const styles = `
   .admin-status.error { background: #1a0f0f; color: #f87171; border: 1px solid #3a1a1a; }
   .admin-status.loading { background: #0f0f1a; color: #8888c8; border: 1px solid #1e1e3a; }
 
-  .docs-list {
-    margin-bottom: 16px;
-  }
+  .docs-list { margin-bottom: 16px; }
 
   .docs-list-label {
     font-size: 10px;
@@ -543,7 +611,10 @@ const styles = `
     border-radius: 7px; padding: 8px 12px; margin-bottom: 6px;
   }
 
-  .doc-item-name { font-size: 12px; color: #4ade80; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .doc-item-name {
+    font-size: 12px; color: #4ade80; flex: 1; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
 `;
 
 const suggestions = [
@@ -559,12 +630,12 @@ export default function App() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Admin state
   const [showAdmin, setShowAdmin] = useState(false);
-  const [adminStep, setAdminStep] = useState("password"); // "password" | "upload"
+  const [adminStep, setAdminStep] = useState("password");
   const [passwordInput, setPasswordInput] = useState("");
-  const [adminStatus, setAdminStatus] = useState(null); // { type, text }
+  const [adminStatus, setAdminStatus] = useState(null);
   const [uploadedDocs, setUploadedDocs] = useState([]);
   const [uploading, setUploading] = useState(false);
 
@@ -585,7 +656,6 @@ export default function App() {
     ta.style.height = Math.min(ta.scrollHeight, 140) + "px";
   };
 
-  // Secret trigger: triple-click the bottom-right button
   const handleAdminTrigger = () => {
     clickCount.current += 1;
     clearTimeout(clickTimer.current);
@@ -679,8 +749,16 @@ export default function App() {
       <style>{styles}</style>
       <div className="layout">
 
+        {/* Mobile overlay — closes sidebar when tapping outside */}
+        {sidebarOpen && (
+          <div
+            className="mobile-overlay open"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
         {/* Left profile panel */}
-        <div className="profile-panel">
+        <div className={`profile-panel ${sidebarOpen ? "open" : ""}`}>
           <div className="avatar-ring">
             👨‍💻
             <div className="online-dot" />
@@ -723,6 +801,13 @@ export default function App() {
         {/* Right chat panel */}
         <div className="chat-panel">
           <div className="chat-header">
+            <button className="mobile-menu-btn" onClick={() => setSidebarOpen(true)}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
+              </svg>
+            </button>
             <div className="chat-header-dot" />
             <div className="chat-header-text">
               Chat with <span>Mikael's AI</span> — ask anything about his background
@@ -796,7 +881,7 @@ export default function App() {
               <textarea
                 ref={textareaRef}
                 className="chat-textarea"
-                placeholder="Ask about Mikael's skills, projects, or experience..."
+                placeholder="Ask about anything..."
                 value={input}
                 rows={1}
                 onChange={e => { setInput(e.target.value); adjustTextarea(); }}
@@ -818,7 +903,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* Hidden admin trigger — triple click the dot in bottom right */}
+      {/* Hidden admin trigger — triple click */}
       <button className="admin-trigger" onClick={handleAdminTrigger}>⚙</button>
 
       {/* Admin modal */}
