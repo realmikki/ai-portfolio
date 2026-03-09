@@ -760,9 +760,18 @@ export default function App() {
         {/* Left profile panel */}
         <div className={`profile-panel ${sidebarOpen ? "open" : ""}`}>
           <div className="avatar-ring">
-            👨‍💻
-            <div className="online-dot" />
-          </div>
+            <img 
+              src="/avatar.jpg" 
+              alt="Mikael Gaup"
+              style={{ 
+                width: "100%", 
+                  height: "100%", 
+                  borderRadius: "50%", 
+                  objectFit: "cover" 
+            }} 
+      />
+  <div className="online-dot" />
+</div>
 
           <div className="profile-name">Mikael Gaup</div>
           <div className="profile-title">Frontend & Mobile Developer</div>
@@ -790,6 +799,14 @@ export default function App() {
             <a className="profile-link" href="https://www.linkedin.com/in/mikael-gaup-775699353/" target="_blank" rel="noreferrer">
               <div className="link-icon">💼</div>
               LinkedIn
+            </a>
+            <a className="profile-link" href="https://instagram.com/mikaelgaup" target="_blank" rel="noreferrer">
+              <div className="link-icon">📸</div>
+              Instagram
+            </a>
+            <a className="profile-link" href="https://x.com/mikkicsgo" target="_blank" rel="noreferrer">
+              <div className="link-icon">𝕏</div>
+              X
             </a>
             <a className="profile-link" href="/cv.pdf" download>
               <div className="link-icon">📄</div>
@@ -955,22 +972,33 @@ export default function App() {
                 )}
 
                 <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf,.txt"
-                  style={{ display: "none" }}
-                  onChange={handleFileUpload}
-                />
-                <button
-                  className="admin-btn"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={uploading}
-                >
-                  {uploading ? "Uploading..." : "+ Upload Document"}
-                </button>
-                <button className="admin-cancel" onClick={() => setShowAdmin(false)}>
-                  Close
-                </button>
+  ref={fileInputRef}
+  type="file"
+  accept=".pdf,.txt"
+  style={{ display: "none" }}
+  onChange={handleFileUpload}
+/>
+<button
+  className="admin-btn"
+  onClick={() => fileInputRef.current?.click()}
+  disabled={uploading}
+>
+  {uploading ? "Uploading..." : "+ Upload Document"}
+</button>
+<button
+  className="admin-cancel"
+  style={{ marginBottom: "10px", borderColor: "#3a1a1a", color: "#f87171" }}
+  onClick={async () => {
+    await fetch(`${API_URL}/clear-docs`, {
+      method: "POST",
+      headers: { "x-admin-password": ADMIN_PASSWORD }
+    });
+    setUploadedDocs([]);
+    setAdminStatus({ type: "success", text: "All documents cleared." });
+  }}
+>
+  🗑 Clear all documents
+</button>
               </>
             )}
           </div>
